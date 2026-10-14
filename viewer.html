@@ -1,17 +1,19 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MAGOR // SPATIAL ARCHIVE</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
+<title>MAGOR // SPATIAL ARCHIVE</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@800&family=Cinzel:wght@400&family=Cormorant+Garamond:wght@400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
 <script type="importmap">{"imports":{
 "three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
 "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
 "@sparkjsdev/spark":"https://cdn.jsdelivr.net/npm/@sparkjsdev/spark@2.3.1/dist/spark.module.js"}}</script>
-</head><body>
+</head><body class="v3 vw">
+<script src="nav.js"></script>
 <div id="viewer"></div>
 <div id="loading"><div class="name">MAGOR // SPATIAL ARCHIVE</div><div class="bar"></div><div id="loadmsg" class="mono">Loading record…</div></div>
 <div class="hud"><div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div><div class="x"></div></div>
-<a class="back mono" href="index.html">← Archive</a>
 <div class="readout mono"><div><b>SCENE ID</b> <span id="rid"></span></div><div><b>LOC</b> <span id="rloc"></span></div><div><b>DATE</b> <span id="rdate"></span></div><div><b>CAM</b> <span id="rcam">—</span></div></div>
-<div class="overlay"><div class="meta mono" id="meta"></div><h1 id="title"></h1><p id="desc"></p></div>
-<div class="hint mono">WASD / arrows — move<br>Q / E — down / up<br>Drag — orbit · Right-drag — pan<br>Scroll / pinch — zoom</div>
+<div class="overlay"><div class="meta mono" id="meta"></div><h1 id="title" class="pix"></h1><p id="desc"></p>
+<a class="dossier-link mono" href="bio.html">Dossier →</a>
+<div class="pn mono"><a id="prev" href="#">◀ Prev</a><span id="pos"></span><a id="next" href="#">Next ▶</a></div></div>
+<div class="hint mono">WASD / arrows — move<br>Q / E — down / up<br>Drag — orbit · Right-drag — pan<br>Scroll / pinch — zoom<br>[ / ] — prev / next</div>
 <div class="pad" id="pad" aria-label="Move pad"><button data-k="f">▲</button><button data-k="l">◀</button><button data-k="b">▼</button><button data-k="r">▶</button></div>
 <script type="module">
 import * as THREE from "three";
@@ -21,6 +23,10 @@ const msg=t=>document.getElementById('loadmsg').textContent=t;
 const id=new URLSearchParams(location.search).get('id');
 const list=await (await fetch('scenes.json')).json();
 const s=list.find(x=>x.id===id)||list[0];
+{const i=list.indexOf(s),N=list.length,u=k=>'viewer.html?id='+encodeURIComponent(list[(i+k+N)%N].id);
+ prev.href=u(-1);next.href=u(1);pos.textContent='N° '+String(i+1).padStart(3,'0')+' / '+String(N).padStart(3,'0');
+ if(N<2)document.querySelector('.pn').style.display='none';
+ addEventListener('keydown',e=>{if(e.key==='['||e.key===',')location.href=u(-1);if(e.key===']'||e.key==='.')location.href=u(1);});}
 if(!s){msg('No scenes found.');throw new Error('no scenes');}
 document.title=s.title+' // MAGOR SPATIAL ARCHIVE';rid.textContent=s.id;rloc.textContent=s.location||'—';rdate.textContent=s.date||'—';
 title.textContent=s.title;meta.textContent='Record / '+s.id;desc.textContent=s.description||'';
