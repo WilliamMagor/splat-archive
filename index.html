@@ -1,29 +1,32 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MAGOR // SPATIAL ARCHIVE</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
-<!-- EDIT BRAND NAME HERE -->
-<nav><div id="brand">MAGOR // SPATIAL ARCHIVE</div><div class="mono" id="clock">SYS ONLINE</div></nav>
-<section class="hero"><div class="mono">// MISSION LOG — CONSTRUCTION CAPTURE PROGRAM</div>
-<h1>Built Sites,<br>Captured in 3D</h1>
-<p>Gaussian splat records of construction projects by William Magor. Select a capture to begin.</p>
-<a class="btn" href="#archive">Enter Archive</a></section>
-<div class="section-h" id="archive"><h2>Archive</h2><span class="mono" id="count" style="font-size:.7rem;color:#8a8a8a"></span></div>
+<title>MAGOR // SPATIAL ARCHIVE</title><meta name="description" content="Construction projects captured as 3D Gaussian splats."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
+<!-- EDIT BRAND NAME HERE (also in footer + viewer.html) -->
+<nav><div id="brand"><span class="dot"></span>MAGOR // SPATIAL ARCHIVE</div><div class="mono">EST. AUSTIN, TX</div></nav>
+<section class="hero">
+<div class="eyebrow mono">Spatial Records <span class="g">/</span> Construction</div>
+<h1>What is built well <em>outlasts</em> its builder.</h1>
+<p class="sub">Job sites by William Magor, captured as walkable 3D Gaussian splats. Every pour, frame and finish, on the record.</p>
+<div class="row"><a class="btn" href="#archive">Enter the archive</a><span class="mono" id="count"></span></div>
+<div class="ruler mono" aria-hidden="true"><span class="t1">Vol. I</span><span class="t2 g">MMXXVI</span><span class="t3">Austin</span></div>
+<div class="coords mono">30.2672° N, 97.7431° W</div><div class="stripes" aria-hidden="true"></div>
+</section>
+<div class="section-h" id="archive"><h2>THE ARCHIVE</h2><span class="mono">Index / Vol. I</span></div>
 <main id="grid"></main>
-<footer class="mono"><span>© William Magor</span><span>MAGOR // SPATIAL ARCHIVE</span></footer>
+<footer><span class="mono">© William Magor — Made in Texas</span><span class="mono">MAGOR // SPATIAL ARCHIVE</span></footer>
 <script>
-const clk=document.getElementById('clock');setInterval(()=>clk.textContent='UTC '+new Date().toISOString().slice(11,19),1000);
 fetch('scenes.json').then(r=>r.json()).then(list=>{
   const g=document.getElementById('grid');
-  document.getElementById('count').textContent=String(list.length).padStart(3,'0')+' RECORDS';
-  for(const s of list){
+  document.getElementById('count').textContent=String(list.length).padStart(3,'0')+' records on file';
+  list.forEach((s,i)=>{
     const a=document.createElement('a');a.className='card';a.href='viewer.html?id='+encodeURIComponent(s.id);
     const box=document.createElement('div');box.className='img';
-    const img=document.createElement('img');img.loading='lazy';img.alt=s.title;img.src=s.thumbnail||'';box.append(img);
-    const info=document.createElement('div');info.className='info';
+    const img=document.createElement('img');img.loading='lazy';img.alt=s.title;img.src=s.thumbnail||'';
+    const idx=document.createElement('span');idx.className='idx mono';idx.textContent='N° '+String(i+1).padStart(3,'0');
+    box.append(img);
     const h=document.createElement('h3');h.textContent=s.title;
     const dl=document.createElement('dl');dl.className='mono';
     for(const [k,v] of [['LOC',s.location],['DATE',s.date],['SCENE ID',s.id]]){const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v||'—';dl.append(dt,dd);}
-    const go=document.createElement('div');go.className='go mono';go.textContent='Launch viewer →';
-    info.append(h,dl,go);a.append(box,info);g.append(a);
-  }
+    a.append(box,idx,h,dl);g.append(a);
+  });
 }).catch(e=>{document.getElementById('grid').textContent='Could not load scenes.json: '+e});
 </script></body></html>

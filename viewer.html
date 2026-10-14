@@ -1,17 +1,17 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MAGOR // SPATIAL ARCHIVE</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
+<title>MAGOR // SPATIAL ARCHIVE</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
 <script type="importmap">{"imports":{
 "three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
 "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
 "@sparkjsdev/spark":"https://cdn.jsdelivr.net/npm/@sparkjsdev/spark@2.3.1/dist/spark.module.js"}}</script>
 </head><body>
 <div id="viewer"></div>
-<div id="loading"><div class="mono" style="font-size:.7rem;color:#8a8a8a;letter-spacing:.3em">MAGOR // SPATIAL ARCHIVE</div><div class="bar"></div><div id="loadmsg" class="mono">Acquiring signal…</div></div>
+<div id="loading"><div class="name">MAGOR // SPATIAL ARCHIVE</div><div class="bar"></div><div id="loadmsg" class="mono">Loading record…</div></div>
 <div class="hud"><div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div><div class="x"></div></div>
 <a class="back mono" href="index.html">← Archive</a>
 <div class="readout mono"><div><b>SCENE ID</b> <span id="rid"></span></div><div><b>LOC</b> <span id="rloc"></span></div><div><b>DATE</b> <span id="rdate"></span></div><div><b>CAM</b> <span id="rcam">—</span></div></div>
 <div class="overlay"><div class="meta mono" id="meta"></div><h1 id="title"></h1><p id="desc"></p></div>
-<div class="hint mono">Drag · Orbit<br>Right-drag · Pan<br>Scroll / Pinch · Zoom</div>
+<div class="hint mono">Drag — orbit<br>Right-drag — pan<br>Scroll / pinch — zoom</div>
 <script type="module">
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -22,7 +22,7 @@ const list=await (await fetch('scenes.json')).json();
 const s=list.find(x=>x.id===id)||list[0];
 if(!s){msg('No scenes found.');throw new Error('no scenes');}
 document.title=s.title+' // MAGOR SPATIAL ARCHIVE';rid.textContent=s.id;rloc.textContent=s.location||'—';rdate.textContent=s.date||'—';
-title.textContent=s.title;meta.textContent='// RECORD '+s.id;desc.textContent=s.description||'';
+title.textContent=s.title;meta.textContent='Record / '+s.id;desc.textContent=s.description||'';
 const el=document.getElementById('viewer');
 const renderer=new THREE.WebGLRenderer({antialias:false});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);el.append(renderer.domElement);
