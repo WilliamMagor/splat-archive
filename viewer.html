@@ -11,7 +11,8 @@
 <a class="back mono" href="index.html">← Archive</a>
 <div class="readout mono"><div><b>SCENE ID</b> <span id="rid"></span></div><div><b>LOC</b> <span id="rloc"></span></div><div><b>DATE</b> <span id="rdate"></span></div><div><b>CAM</b> <span id="rcam">—</span></div></div>
 <div class="overlay"><div class="meta mono" id="meta"></div><h1 id="title"></h1><p id="desc"></p></div>
-<div class="hint mono">Drag — orbit<br>Right-drag — pan<br>Scroll / pinch — zoom</div>
+<div class="hint mono">WASD / arrows — move<br>Q / E — down / up<br>Drag — orbit · Right-drag — pan<br>Scroll / pinch — zoom</div>
+<div class="pad" id="pad" aria-label="Move pad"><button data-k="f">▲</button><button data-k="l">◀</button><button data-k="b">▼</button><button data-k="r">▶</button></div>
 <script type="module">
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -29,14 +30,29 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.01,1000);
 scene.add(new SparkRenderer({renderer}));
-const cam=s.camera||{};camera.position.fromArray(cam.position||[0,0,3]);
+const cam=s.camera||{};const endPos=new THREE.Vector3().fromArray(cam.position||[0,0,3]);const tgt=new THREE.Vector3().fromArray(cam.target||[0,0,0]);
+const startPos=endPos.clone().sub(tgt).multiplyScalar(4).add(tgt).add(new THREE.Vector3(0,endPos.distanceTo(tgt)*1.2,0));
+camera.position.copy(matchMedia('(prefers-reduced-motion: reduce)').matches?endPos:startPos);
 const controls=new OrbitControls(camera,renderer.domElement);controls.target.fromArray(cam.target||[0,0,0]);controls.enableDamping=true;controls.update();
+// Cinematic fly-in (~3s ease), starts once splat is ready, cancelled by any user input
+let fly=null;controls.addEventListener('start',()=>{if(fly){fly=null;}});
 const mesh=new SplatMesh({url:s.file});
 if(s.flipY!==false) mesh.quaternion.set(1,0,0,0); // most 3DGS exports are Y-down
 scene.add(mesh);
-mesh.initialized.then(()=>document.getElementById('loading').classList.add('hide'))
+mesh.initialized.then(()=>{document.getElementById('loading').classList.add('hide');if(!camera.position.equals(endPos))fly={t0:performance.now(),from:camera.position.clone()};})
   .catch(e=>{msg('Failed to load splat: '+e.message);console.error(e);});
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+// First-person style movement: WASD/arrows (+Q/E), and on-screen pad. Moves camera and orbit target together.
+const keys=new Set(),pad=new Set();const km={KeyW:'f',ArrowUp:'f',KeyS:'b',ArrowDown:'b',KeyA:'l',ArrowLeft:'l',KeyD:'r',ArrowRight:'r',KeyE:'u',KeyQ:'d'};
+addEventListener('keydown',e=>{if(km[e.code]){keys.add(km[e.code]);fly=null;e.preventDefault();}});addEventListener('keyup',e=>keys.delete(km[e.code]));
+addEventListener('blur',()=>keys.clear());
+for(const b of document.querySelectorAll('#pad button')){const k=b.dataset.k;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();pad.add(k);fly=null;});for(const ev of ['pointerup','pointerleave','pointercancel'])b.addEventListener(ev,()=>pad.delete(k));}
+let last=performance.now();const fwd=new THREE.Vector3(),right=new THREE.Vector3(),mv=new THREE.Vector3();
+function walk(){const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;const a=new Set([...keys,...pad]);if(!a.size)return;
+ camera.getWorldDirection(fwd);fwd.y=0;fwd.normalize();right.crossVectors(fwd,camera.up).normalize();mv.set(0,0,0);
+ if(a.has('f'))mv.add(fwd);if(a.has('b'))mv.sub(fwd);if(a.has('r'))mv.add(right);if(a.has('l'))mv.sub(right);if(a.has('u'))mv.y+=1;if(a.has('d'))mv.y-=1;
+ const sp=Math.max(.5,camera.position.distanceTo(controls.target))*0.9*dt;mv.multiplyScalar(sp);camera.position.add(mv);controls.target.add(mv);}
 const rcam=document.getElementById('rcam');let fr=0;
-renderer.setAnimationLoop(()=>{controls.update();if(++fr%10==0)rcam.textContent=camera.position.toArray().map(v=>v.toFixed(2)).join(' / ');renderer.render(scene,camera);});
+renderer.setAnimationLoop(()=>{if(fly){const k=Math.min(1,(performance.now()-fly.t0)/3000),e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;camera.position.lerpVectors(fly.from,endPos,e);if(k>=1)fly=null;}walk();controls.update();if(++fr%10==0)rcam.textContent=camera.position.toArray().map(v=>v.toFixed(2)).join(' / ');renderer.render(scene,camera);});
 </script></body></html>

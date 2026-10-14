@@ -1,13 +1,68 @@
 [
   {
+    "id": "sample-valley",
+    "title": "SAMPLE – Valley (outdoor, replace me)",
+    "location": "Sample location",
+    "date": "2026-01-01",
+    "description": "SAMPLE: outdoor terrain splat (6.8 MB .spz) from sparkjs.dev. Walk it with WASD or the move pad.",
+    "file": "https://sparkjs.dev/assets/splats/valley.spz",
+    "thumbnail": "thumbs/sample-valley.svg",
+    "camera": {
+      "position": [
+        0,
+        0.5,
+        3
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ]
+    },
+    "flipY": true
+  },
+  {
+    "id": "sample-forge",
+    "title": "SAMPLE – Forge (scene, replace me)",
+    "location": "Sample location",
+    "date": "2026-01-01",
+    "description": "SAMPLE: blacksmith forge splat (6.0 MB .spz) from sparkjs.dev. Orbit, zoom and walk around.",
+    "file": "https://sparkjs.dev/assets/splats/forge.spz",
+    "thumbnail": "thumbs/sample-forge.svg",
+    "camera": {
+      "position": [
+        0,
+        0.5,
+        3
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ]
+    },
+    "flipY": true
+  },
+  {
     "id": "sample-butterfly",
     "title": "SAMPLE – Butterfly (replace me)",
     "location": "Sample location",
     "date": "2026-01-01",
-    "description": "SAMPLE SCENE: public demo splat from sparkjs.dev. Replace this entry with your own project.",
+    "description": "SAMPLE: small object splat from sparkjs.dev. Replace with your own project.",
     "file": "https://sparkjs.dev/assets/splats/butterfly.spz",
     "thumbnail": "https://sparkjs.dev/assets/images/butterfly.png",
-    "camera": { "position": [0, 0, 3], "target": [0, 0, 0] },
+    "camera": {
+      "position": [
+        0,
+        0,
+        3
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ]
+    },
     "flipY": true
   }
 ]

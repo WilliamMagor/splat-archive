@@ -1,18 +1,19 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MAGOR // SPATIAL ARCHIVE</title><meta name="description" content="Construction projects captured as 3D Gaussian splats."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
+<title>MAGOR // SPATIAL ARCHIVE</title><meta name="description" content="A personal spatial archive of places and things, recorded as 3D Gaussian splats."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
 <!-- EDIT BRAND NAME HERE (also in footer + viewer.html) -->
-<nav><div id="brand"><span class="dot"></span>MAGOR // SPATIAL ARCHIVE</div><div class="mono">EST. AUSTIN, TX</div></nav>
-<section class="hero">
-<div class="eyebrow mono">Spatial Records <span class="g">/</span> Construction</div>
-<h1>What is built well <em>outlasts</em> its builder.</h1>
-<p class="sub">Job sites by William Magor, captured as walkable 3D Gaussian splats. Every pour, frame and finish, on the record.</p>
+<nav><div id="brand"><span class="dot"></span>MAGOR // SPATIAL ARCHIVE</div></nav>
+<section class="hero"><canvas id="bg" aria-hidden="true"></canvas>
+<div class="eyebrow mono">Spatial Records <span class="g">/</span> Personal Archive</div>
+<h1>“The central stone or <em>the foundation.</em>”</h1>
+<div class="attr mono">— J. Evola, The Mystery of the Grail</div>
+<p class="sub">Places and things William Magor loves, recorded as walkable 3D Gaussian splats and kept on file.</p>
 <div class="row"><a class="btn" href="#archive">Enter the archive</a><span class="mono" id="count"></span></div>
 <div class="ruler mono" aria-hidden="true"><span class="t1">Vol. I</span><span class="t2 g">MMXXVI</span><span class="t3">Austin</span></div>
-<div class="coords mono">30.2672° N, 97.7431° W</div><div class="stripes" aria-hidden="true"></div>
+<div class="coords mono">30.2672° N, 97.7431° W &nbsp;·&nbsp; EST. AUSTIN, TX</div><div class="stripes" aria-hidden="true"></div>
 </section>
 <div class="section-h" id="archive"><h2>THE ARCHIVE</h2><span class="mono">Index / Vol. I</span></div>
 <main id="grid"></main>
-<footer><span class="mono">© William Magor — Made in Texas</span><span class="mono">MAGOR // SPATIAL ARCHIVE</span></footer>
+<footer></footer>
 <script>
 fetch('scenes.json').then(r=>r.json()).then(list=>{
   const g=document.getElementById('grid');
@@ -25,8 +26,29 @@ fetch('scenes.json').then(r=>r.json()).then(list=>{
     box.append(img);
     const h=document.createElement('h3');h.textContent=s.title;
     const dl=document.createElement('dl');dl.className='mono';
-    for(const [k,v] of [['LOC',s.location],['DATE',s.date],['SCENE ID',s.id]]){const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v||'—';dl.append(dt,dd);}
-    a.append(box,idx,h,dl);g.append(a);
+    for(const [k,v] of [['LOC',s.location],['DATE',s.date],['SCENE ID',s.id]]){const w=document.createElement('div');const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v||'—';w.append(dt,dd);dl.append(w);}
+    const d=document.createElement('p');d.className='desc';d.textContent=s.description||'';
+    a.append(box,idx,h,d,dl);g.append(a);
   });
 }).catch(e=>{document.getElementById('grid').textContent='Could not load scenes.json: '+e});
-</script></body></html>
+</script><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
+<script type="module">
+// Hero background: lightweight point-cloud "city block", slow rotation. Static frame if reduced motion.
+import * as THREE from "three";
+const cv=document.getElementById('bg'),hero=cv.parentElement;
+const r=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:false});r.setPixelRatio(Math.min(devicePixelRatio,1.5));
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,200);cam.position.set(0,9,26);cam.lookAt(0,2,0);
+const pts=[],rnd=(a,b)=>a+Math.random()*(b-a);
+for(let i=0;i<26;i++){const x=rnd(-14,14),z=rnd(-10,10),w=rnd(1,3),d=rnd(1,3),hh=rnd(1,9)*(1-Math.hypot(x,z)/22);
+ for(let y=0;y<=hh;y+=.45)for(let t=0;t<1;t+=.12){pts.push(x+w*t,y,z, x+w*t,y,z+d, x,y,z+d*t, x+w,y,z+d*t);}}
+for(let x=-16;x<=16;x+=.8)for(let z=-12;z<=12;z+=.8)pts.push(x,0,z);
+const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+const m=new THREE.PointsMaterial({color:0xC6FFB0,size:.06,transparent:true,opacity:.32,depthWrite:false});
+const cloud=new THREE.Points(g,m);sc.add(cloud);
+const size=()=>{const w=hero.clientWidth,h=hero.clientHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.position.z=w<700?34:26;cam.updateProjectionMatrix();r.render(sc,cam)};
+addEventListener('resize',size);size();
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;let vis=true;
+new IntersectionObserver(e=>vis=e[0].isIntersecting).observe(hero);
+if(!still)r.setAnimationLoop(t=>{if(!vis)return;cloud.rotation.y=t*0.00004;r.render(sc,cam)});
+</script>
+</body></html>

@@ -1,4 +1,4 @@
-# William Magor – Gaussian Splat Portfolio
+# William Magor – Gaussian Splat Archive
 
 Static site, no build step. Works on GitHub Pages as-is.
 Viewer: [Spark](https://sparkjs.dev) 2.3.1 + three.js 0.180.0, loaded from jsDelivr.
